@@ -17,6 +17,6 @@ public without sharing class TH_Order extends TriggerHandler {
     }
 
     public override void afterUpdate(){
-
+        OrderHelper.setAccountRevenue(newMap, oldMap);
     }
 }
