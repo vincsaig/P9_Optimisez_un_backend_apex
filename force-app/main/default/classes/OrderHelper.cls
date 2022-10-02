@@ -15,14 +15,25 @@ public without sharing class OrderHelper {
             if(newOrder.Status == 'Ordered' && oldOrder.Status != 'Ordered'){
                 if(mapAccountIdListOfOrder.get(newOrder.AccountId) != null){
                     mapAccountIdListOfOrder.get(newOrder.AccountId).add(newOrder);
-                } 
+                }
                 else{
                     mapAccountIdListOfOrder.put(newOrder.AccountId,new List<Order>{newOrder});
                 }
             }
         }
+        
         if(mapAccountIdListOfOrder.size() > 0){
-            List<Account> accountsList = [SELECT Id, Chiffre_d_affaire__c FROM Account WHERE Id IN :mapAccountIdListOfOrder.keySet()];
+            List<Account> accountsLIst = getAccountAndSetRevenue(mapAccountIdListOfOrder);
+            if(accountsList.size() > 0){
+                update accountsList;
+            }
+        }
+    }
+
+    public static List<Account> getAccountAndSetRevenue(Map<Id, List<Order>> mapAccountIdListOfOrder){
+        List<Account> accountsList = new List<Account>();
+        if(mapAccountIdListOfOrder.size() > 0){
+            accountsList = [SELECT Id, Chiffre_d_affaire__c FROM Account WHERE Id IN :mapAccountIdListOfOrder.keySet()];
             for(Account account : accountsList){
                 for(Order accountOrder : mapAccountIdListOfOrder.get(account.Id)){
                     if(account.Chiffre_d_affaire__c == null){
@@ -31,10 +42,10 @@ public without sharing class OrderHelper {
                     account.Chiffre_d_affaire__c += accountOrder.TotalAmount;
                 }
             }
-
-            if(accountsList.size() > 0){
-                update accountsList;
-            }
         }
+        if(accountsList.size() == 0){
+            return null;
+        }
+        return accountsList;
     }
 }

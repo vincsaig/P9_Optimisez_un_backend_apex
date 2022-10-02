@@ -7,6 +7,7 @@ global class Batch01AccountChiffreAffaire implements Database.Batchable<sObject>
     
     global void execute(Database.BatchableContext info, List<Order> scope){
         Map<Id,List<Order>> mapAccountIdListOfOrder = new Map<Id, List<Order>>();
+        List<Account> accountsList = new List<Account>();
         for(Order order : scope){
             if(mapAccountIdListOfOrder.get(order.AccountId) != null){
                 mapAccountIdListOfOrder.get(order.AccountId).add(order);
@@ -17,20 +18,13 @@ global class Batch01AccountChiffreAffaire implements Database.Batchable<sObject>
         }
 
         if(mapAccountIdListOfOrder.size() > 0){
-            List<Account> accountsList = [SELECT Id, Chiffre_d_affaire__c FROM Account WHERE Id IN :mapAccountIdListOfOrder.keySet()];
-            for(Account account : accountsList){
-                account.Chiffre_d_affaire__c = 0;
-                for(Order accountOrder : mapAccountIdListOfOrder.get(account.Id)){
-                    account.Chiffre_d_affaire__c += accountOrder.TotalAmount;
-                }
-            }
-
-            if(accountsList.size() > 0){
-                update accountsList;
-            }
+            accountsList = OrderHelper.getAccountAndSetRevenue(mapAccountIdListOfOrder);
+        }
+        if(accountsList.size() > 0){
+            update accountsList;
         }
     }
     
-    global void finish(Database.BatchableContext info){      
+    global void finish(Database.BatchableContext info){
     }
 }
