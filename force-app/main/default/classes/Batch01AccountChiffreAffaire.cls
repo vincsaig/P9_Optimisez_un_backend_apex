@@ -1,11 +1,12 @@
 global class Batch01AccountChiffreAffaire implements Database.Batchable<sObject>{
     
     global Database.QueryLocator start(Database.BatchableContext info){ 
-        //Requeter seulement les comptes qui ont au moins une commande avec le Status 'Ordered'
+        //Query all orders that are 'Ordered'
         return Database.getQueryLocator('SELECT Id, TotalAmount, AccountId FROM Order WHERE Status = \'Ordered\'');
     }
     
     global void execute(Database.BatchableContext info, List<Order> scope){
+        //We store the orders based on their account Id which is found on the order
         Map<Id,List<Order>> mapAccountIdListOfOrder = new Map<Id, List<Order>>();
         List<Account> accountsList = new List<Account>();
         for(Order order : scope){
