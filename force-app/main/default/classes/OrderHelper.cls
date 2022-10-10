@@ -1,4 +1,5 @@
 public without sharing class OrderHelper {
+    //Sets the net amount for the order based on TotalAmount - ShipmentCost
     public static void setNetAmount(Map<Id,Order> newOrdersMap, Map<Id,Order> oldOrdersMap){
         for(Order newOrder : newOrdersMap.values()){
             Order oldOrder = oldOrdersMap.get(newOrder.Id);
@@ -8,6 +9,7 @@ public without sharing class OrderHelper {
         }
     }
 
+    //We store the orders based on their Account Id which is found on the order
     public static void setAccountRevenue(Map<Id,Order> newOrdersMap, Map<Id,Order> oldOrdersMap){
         Map<Id, List<Order>> mapAccountIdListOfOrder = new Map<Id, List<Order>>();
         for(Order newOrder : newOrdersMap.values()){
@@ -30,6 +32,7 @@ public without sharing class OrderHelper {
         }
     }
 
+    //Query all accounts based on the map keys, then sets their revenue based on all the linked orders that are 'Ordered'
     public static List<Account> getAccountAndSetRevenue(Map<Id, List<Order>> mapAccountIdListOfOrder){
         List<Account> accountsList = new List<Account>();
         if(mapAccountIdListOfOrder.size() > 0){
